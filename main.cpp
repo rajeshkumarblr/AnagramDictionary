@@ -25,7 +25,7 @@ bool checkFile(char* filename) {
     return (access( filename, F_OK ) != -1 );
 }
 
-string RandomString(int len)
+string genRandomString(int len)
 {
    string str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
    string newstr;
@@ -37,6 +37,10 @@ string RandomString(int len)
    return newstr;
 }
 
+
+#define LOOKUP_TIMING_TEST 1
+#define LOOKUP_TIMING_TEST_ITERATIONS 1000
+//#define LOOKUP_TIMING_TEST_PRINT_INDIVIDUAL_TIMING
 
 int main(int argc, char* argv[])
 {
@@ -76,23 +80,35 @@ int main(int argc, char* argv[])
         }
     }
 
-    // Test randome strings to check the speed.
+#ifdef LOOKUP_TIMING_TEST
+    int64_t total_duration = 0;
+    // Test looking up random strings to check the average lookup speed
     srand(time(0));
-    for (int i=0; i< 20; i++) {
-        string mystr = RandomString(10);
+    for (int i=0; i< LOOKUP_TIMING_TEST_ITERATIONS; i++) {
+        string mystr = genRandomString(i+10);
 
+        // measure the lookup time.
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
         const char* str = dict.findFirstAngaramWord(mystr.c_str());
         high_resolution_clock::time_point t2 = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+        total_duration += duration;
 
+#ifdef LOOKUP_TIMING_TEST_PRINT_INDIVIDUAL_TIMING
         if (str != NULL) {
             string matchWord(str);
             cout << "First Found match: " << matchWord  << " for " << word <<  " took " << duration << "microseconds" << endl;
         } else {
             cout << "No match for: " << mystr << " took " << duration << "microseconds" << endl;
         }
+#endif
     }
+
+    double avgtime = (double)total_duration/ (double)LOOKUP_TIMING_TEST_ITERATIONS;
+    cout << "Average lookup time for random strings: in " << LOOKUP_TIMING_TEST_ITERATIONS 
+        << " iterations is: " << avgtime << " micro seconds" << endl;
+
+#endif //LOOKUP_TIMING_TEST
 
     return 0;
 }

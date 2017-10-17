@@ -167,7 +167,7 @@ const char* AnagramDictionary::findFirstAngaramWord(const char* word) {
     const char* anagWord = NULL;
     HashVal val = hashWord(word, strlen(word));
     unsigned int slot = val % HASHTABLE_SIZE;
-    hashEntry* entry = hashtab[slot];
+    const hashEntry* entry = hashtab[slot];
     if (entry == NULL) {
         return NULL;
     } else {
